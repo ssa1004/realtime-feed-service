@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: realtime-feed-service
+  profiles:
+    active: dev
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  r2dbc:
+    url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:feed}
+    username: ${DB_USER:feed}
+    password: ${DB_PASSWORD:feed}
+    pool:
+      initial-size: 2
+      max-size: 10
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # auth-service 의 JWK Set endpoint. dev 에서는 SecurityConfig 가 dev profile 분기로 우회.
+          jwk-set-uri: ${OAUTH_JWK_SET_URI:http://auth-service:8080/.well-known/jwks.json}
+
+server:
+  port: 8080
+  shutdown: graceful  # ADR-0010 — graceful shutdown
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus, metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState
+
+feed:
+  kafka:
+    enabled: ${KAFKA_ENABLED:false}
+    bootstrap: ${KAFKA_BOOTSTRAP:localhost:9092}
+    group-id: realtime-feed-service
+    topic:
+      trade-matched: market.tradematched
+  stream:
+    sample-window-ms: 100
+    catch-up-limit: 50
+
+logging:
+  level:
+    root: INFO
+    com.example.feed: DEBUG
+    reactor.kafka: INFO
+    org.springframework.r2dbc: INFO

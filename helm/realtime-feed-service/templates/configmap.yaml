@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "realtime-feed-service.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "realtime-feed-service.labels" . | nindent 4 }}
+data:
+  SPRING_PROFILES_ACTIVE: {{ .Values.springProfile | quote }}
+  DB_HOST: {{ .Values.postgres.host | quote }}
+  DB_PORT: {{ .Values.postgres.port | quote }}
+  DB_NAME: {{ .Values.postgres.database | quote }}
+  DB_USER: {{ .Values.postgres.user | quote }}
+  REDIS_HOST: {{ .Values.redis.host | quote }}
+  REDIS_PORT: {{ .Values.redis.port | quote }}
+  KAFKA_ENABLED: {{ .Values.kafka.enabled | quote }}
+  KAFKA_BOOTSTRAP: {{ .Values.kafka.bootstrapServers | quote }}
+  KAFKA_TOPIC_TRADE_MATCHED: {{ .Values.kafka.topicTradeMatched | quote }}
+  OAUTH_JWK_SET_URI: {{ .Values.oauth.jwkSetUri | quote }}
+  {{- range $k, $v := .Values.extraEnv }}
+  {{ $k }}: {{ $v | quote }}
+  {{- end }}
