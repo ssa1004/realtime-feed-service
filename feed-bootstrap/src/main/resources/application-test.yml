@@ -1,0 +1,19 @@
+# 테스트 프로필 — Smoke test 시 외부 의존이 없도록 비활성화.
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
+      - org.springframework.boot.autoconfigure.r2dbc.R2dbcDataAutoConfiguration
+      - org.springframework.boot.autoconfigure.r2dbc.R2dbcRepositoriesAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration
+
+feed:
+  kafka:
+    enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

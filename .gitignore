@@ -1,0 +1,43 @@
+# Gradle
+.gradle/
+/build/
+*/build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/**/build/
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+out/
+*/out/
+!**/src/**/out/
+
+# Eclipse
+.project
+.classpath
+.settings/
+bin/
+
+# VSCode
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 작업 메모 — AGENTS.md 규칙
+PLAN.md
+TODO.md
+notes.md
+.Codex/
+.claude/
+
+# 환경별 시크릿
+.env
+.env.local
+*.local.yml
+
+# 로그
+*.log
+logs/

@@ -1,0 +1,64 @@
+version: "3.9"
+
+# 통합 환경 — 한 머신에서 한 사이클 (mock JWT → SSE / WebSocket 구독 → mock 거래 이벤트 → 수신).
+# 외부 의존을 mock 으로 닫아 다른 portfolio 레포 없이도 본 앱이 자동으로 데모된다.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: feed
+      POSTGRES_PASSWORD: feed
+      POSTGRES_DB: feed
+    ports: ["54322:5432"]   # 다른 portfolio 의 5432 와 충돌 방지
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U feed -d feed"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+
+  redis:
+    image: redis:7-alpine
+    ports: ["63799:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  kafka:
+    image: bitnami/kafka:3.7
+    environment:
+      KAFKA_CFG_NODE_ID: "0"
+      KAFKA_CFG_PROCESS_ROLES: "controller,broker"
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: "0@kafka:9093"
+      KAFKA_CFG_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports: ["19092:9092"]
+
+  feed:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      kafka: { condition: service_started }
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: feed
+      DB_USER: feed
+      DB_PASSWORD: feed
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      KAFKA_ENABLED: "true"
+      KAFKA_BOOTSTRAP: kafka:9092
+      OAUTH_JWK_SET_URI: "http://localhost:9999/.well-known/jwks.json"  # dev 우회
+    ports: ["8088:8080"]

@@ -1,0 +1,193 @@
+# realtime-feed-service 기본 values. 운영 오버라이드는 values-prod.yaml 참고.
+# 기본은 dev/local-cluster 상정 — replicas 1, ingress off, NetworkPolicy off, kafka consumer off.
+
+# ----------------------------------------------------------------------------
+# 이미지
+# ----------------------------------------------------------------------------
+image:
+  repository: ghcr.io/ssa1004/realtime-feed-service
+  # tag 가 비면 .Chart.AppVersion 사용
+  tag: ""
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# ----------------------------------------------------------------------------
+# 워크로드
+# ----------------------------------------------------------------------------
+replicaCount: 1
+
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+
+# Spring 프로필. dev 에서는 인증 우회 + Kafka consumer off, prod 에서는 모두 강제.
+springProfile: dev
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
+
+# ----------------------------------------------------------------------------
+# Graceful shutdown
+# ----------------------------------------------------------------------------
+# WebSocket / SSE 연결이 종료 직전까지 살아 있으므로 graceful 종료가 중요.
+#   1) preStop sleep 으로 endpoint propagation 완료 대기 (~10s)
+#   2) Spring Boot graceful shutdown 으로 active connection close 통보 + Kafka consumer 정리
+#   3) terminationGracePeriodSeconds 안에 끝나지 않으면 SIGKILL
+# WebSocket 의 graceful close 는 client 가 재연결할 시간을 주는 의미. 30s 이면 충분.
+terminationGracePeriodSeconds: 60
+preStopSleepSeconds: 10
+
+# ----------------------------------------------------------------------------
+# Probes
+# ----------------------------------------------------------------------------
+probes:
+  startup:
+    enabled: true
+    path: /actuator/health/liveness
+    failureThreshold: 30  # 30 × 2s = 60s 부팅 허용
+    periodSeconds: 2
+    timeoutSeconds: 3
+  liveness:
+    enabled: true
+    path: /actuator/health/liveness
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+  readiness:
+    enabled: true
+    path: /actuator/health/readiness
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 2
+
+# ----------------------------------------------------------------------------
+# Service / Pod 보안 컨텍스트
+# ----------------------------------------------------------------------------
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  fsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+
+# ----------------------------------------------------------------------------
+# Service
+# ----------------------------------------------------------------------------
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+  annotations: {}
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8080"
+  prometheus.io/path: "/actuator/prometheus"
+
+podLabels: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# ----------------------------------------------------------------------------
+# Ingress
+# ----------------------------------------------------------------------------
+# 본 앱이 외부에 노출하는 path 군:
+#   /api/v1/feed/*   — REST + SSE (text/event-stream)
+#   /ws/feed/*       — WebSocket (HTTP Upgrade)
+# WebSocket 의 path 는 ingress 에서 별도 timeout 설정이 필요. nginx ingress 의 경우
+# annotations 으로 nginx.ingress.kubernetes.io/proxy-read-timeout 같은 것을 권장.
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+    # nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    # nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+  hosts:
+    - host: feed.example.com
+      paths:
+        - path: /api/v1/feed
+          pathType: Prefix
+        - path: /ws/feed
+          pathType: Prefix
+  tls: []
+
+# ----------------------------------------------------------------------------
+# Autoscaling
+# ----------------------------------------------------------------------------
+# WebSocket 의 long-lived connection 은 CPU 사용률만 보면 과소평가될 수 있다.
+# 운영에서는 active_connection_count 같은 custom metric 으로 KEDA 등 사용 권장.
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# ----------------------------------------------------------------------------
+# PodDisruptionBudget
+# ----------------------------------------------------------------------------
+pdb:
+  enabled: false
+  minAvailable: 1
+
+# ----------------------------------------------------------------------------
+# NetworkPolicy
+# ----------------------------------------------------------------------------
+networkPolicy:
+  enabled: false
+  ingressNamespaceSelector:
+    kubernetes.io/metadata.name: ingress-nginx
+
+# ----------------------------------------------------------------------------
+# 외부 의존
+# ----------------------------------------------------------------------------
+postgres:
+  host: postgres.market.svc.cluster.local
+  port: 5432
+  database: feed
+  user: feed
+  password: feed
+  existingSecret: ""
+  existingSecretPasswordKey: password
+
+redis:
+  host: redis.market.svc.cluster.local
+  port: 6379
+
+kafka:
+  enabled: false
+  bootstrapServers: kafka.market.svc.cluster.local:9092
+  topicTradeMatched: market.tradematched
+  groupId: realtime-feed-service
+
+# auth-service 의 JWK Set endpoint
+oauth:
+  jwkSetUri: http://auth-service.auth.svc.cluster.local:8080/.well-known/jwks.json
+
+# 추가 환경 변수 (자유 주입). configMap 으로 들어간다.
+extraEnv: {}
+
+# 추가 envFrom (이미 클러스터에 존재하는 secret/configmap 을 재사용할 때).
+extraEnvFrom: []

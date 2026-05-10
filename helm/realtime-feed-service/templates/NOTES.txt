@@ -1,0 +1,36 @@
+{{ .Chart.Name }} v{{ .Chart.AppVersion }} 가 namespace "{{ .Release.Namespace }}" 에 설치되었습니다.
+
+릴리스 이름: {{ .Release.Name }}
+이미지: {{ include "realtime-feed-service.image" . }}
+프로필: {{ .Values.springProfile }}
+복제본: {{ if .Values.autoscaling.enabled }}HPA {{ .Values.autoscaling.minReplicas }}~{{ .Values.autoscaling.maxReplicas }}{{ else }}{{ .Values.replicaCount }}{{ end }}
+
+상태 확인:
+  kubectl -n {{ .Release.Namespace }} rollout status deploy/{{ include "realtime-feed-service.fullname" . }}
+  kubectl -n {{ .Release.Namespace }} get pods -l app.kubernetes.io/instance={{ .Release.Name }}
+
+{{- if .Values.ingress.enabled }}
+
+외부 endpoint:
+{{- range .Values.ingress.hosts }}
+  https://{{ .host }}
+{{- range .paths }}
+    {{ .path }}
+{{- end }}
+{{- end }}
+
+WebSocket 은 ingress controller 의 timeout 설정이 중요합니다. nginx 의 경우
+proxy-read-timeout / proxy-send-timeout 을 1시간 정도로 설정하세요 (이 chart 의
+values-prod.yaml 에 예시 포함).
+{{- else }}
+
+ClusterIP service:
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "realtime-feed-service.fullname" . }} 8080:{{ .Values.service.port }}
+  open http://localhost:8080/actuator/health
+
+  # SSE 시연
+  curl -N http://localhost:8080/api/v1/feed/NIKE-DUNK-LOW-001/stream
+
+  # WebSocket 시연 (websocat / wscat 등)
+  websocat ws://localhost:8080/ws/feed/NIKE-DUNK-LOW-001
+{{- end }}
