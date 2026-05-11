@@ -26,7 +26,7 @@ import reactor.core.publisher.Mono
  *   2) Reactor 가 upstream Flux (= sink subscription) 를 cancel
  *   3) cancel 신호가 [com.example.feed.adapter.outbound.sink.ReactorFeedSink.subscribe] 로 전파
  *
- * 한 SKU 에 N 개의 클라이언트가 붙으면 sink 의 multicast 가 N 개 모두에게 brodcast.
+ * 한 SKU 에 N 개의 클라이언트가 붙으면 sink 의 multicast 가 N 개 모두에게 broadcast 한다.
  * slow consumer 는 `Sinks.many().multicast().onBackpressureBuffer` 의 버퍼 한도를 넘기면
  * `EmitResult.FAIL_OVERFLOW` 로 떨어진다 (ADR-0007).
  */

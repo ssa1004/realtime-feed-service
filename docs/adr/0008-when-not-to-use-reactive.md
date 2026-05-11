@@ -4,12 +4,11 @@
 적용
 
 ## 배경
-"reactive 가 무조건 빠르다" 는 흔한 오해다. 본 레포는 100% Kotlin reactive 를 의도적으로
-선택했지만, 이는 "실시간 fan-out + WebSocket 다수 클라이언트 + 비동기 메시지 stream"
-이라는 **본 도메인의 특성** 때문이다. 다른 도메인에서는 잘못된 선택일 수 있다.
+"reactive 가 무조건 빠르다" 는 흔한 오해다. 본 레포는 Kotlin coroutines + Spring WebFlux
+를 의도적으로 선택했지만, 이는 "실시간 fan-out + WebSocket 다수 클라이언트 + 비동기 메시지
+stream" 이라는 **본 도메인의 특성** 때문이다. 다른 도메인에서는 잘못된 선택일 수 있다.
 
-본 ADR 은 "언제 reactive 를 쓰지 말아야 하는가" 를 정리한다 — 이게 실제로 본 ADR
-세트에서 가장 가치있는 항목이라고 생각한다.
+본 ADR 은 "언제 reactive 를 쓰지 말아야 하는가" 의 판단 기준을 정리한다.
 
 ## 결정
 
@@ -58,13 +57,13 @@ reactive 의 디버깅, profiling, 경험적 직관 (operator 의 thread 행동,
 - 한 publisher → 다수 subscriber 의 fan-out (multicast).
 
 본 레포는 셋 다 해당해 reactive 가 명확히 의미가 있다. 결제 / 정산 같은 도메인이라면
-다른 8 레포처럼 imperative + JPA 를 골랐을 것.
+portfolio 의 다른 레포처럼 imperative + JPA 를 골랐을 것이다.
 
 ## 결과
-- 본 portfolio 안에서 reactive 가 정당화되는 도메인이 *어느 것* 인지 명확히 분리.
-- 신규 portfolio 레포를 만들 때 "이 도메인이 reactive 적합한가?" 를 본 ADR 로 빠르게 판단.
-- (단점) "reactive 좋다" 라는 막연한 기대로 잘못된 도메인에 도입할 위험은 항상 남아 있음
-  — 인터뷰나 코드 리뷰에서 본 ADR 의 기준을 다시 꺼내 적용.
+- 본 portfolio 안에서 reactive 가 정당화되는 도메인이 어느 것인지 명확히 분리.
+- 신규 portfolio 레포를 만들 때 "이 도메인이 reactive 에 적합한가?" 를 본 ADR 로 빠르게 판단.
+- (단점) "reactive 가 좋다" 라는 막연한 기대로 잘못된 도메인에 도입할 위험은 항상 남아 있다
+  — 코드 리뷰 단계에서 본 ADR 의 기준을 다시 꺼내 적용한다.
 
 ## 다시 검토할 시점
 - Java virtual thread 가 충분히 성숙해 reactive 의 가치 일부가 사라질 때 — long-lived

@@ -27,8 +27,8 @@ import java.util.concurrent.ConcurrentHashMap
  * 책임진다. 자세한 trade-off 는 ADR-0007.
  *
  * `onBackpressureBuffer` — 가장 단순한 backpressure 정책. 버퍼 크기 [BUFFER_SIZE] 초과 시
- * `OverflowStrategy.ERROR` (기본) 로 publisher 가 실패한다. 운영에서는 metric 을 봐가며
- * tune 한다.
+ * `tryEmitNext` 가 [Sinks.EmitResult.FAIL_OVERFLOW] 를 반환한다 — 해당 emit 만 손실되고
+ * 다른 subscriber 의 fan-out 은 계속 진행된다. 운영에서는 실패 횟수를 metric 으로 보고 tune.
  */
 @Component
 class ReactorFeedSink : FeedSink {

@@ -15,7 +15,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import org.slf4j.LoggerFactory
@@ -32,16 +31,15 @@ import java.util.UUID
  * resell-orderbook 이 발행하는 `trade.matched` 토픽 consumer.
  *
  * Reactor Kafka 의 [KafkaReceiver] 를 쓴다 — Spring Kafka 와 달리 한 토픽 = 한 Flux 로
- * 추상화돼 backpressure 를 자연스럽게 다룰 수 있다 (ADR-0007).
+ * 추상화돼 backpressure 를 자연스럽게 다룰 수 있다 (ADR-0003).
  *
  * 메시지 처리:
  *   1) JSON 역직렬화 → 도메인 [FeedEvent.TradeMatched] 로 변환
  *   2) [IngestTradeMatchedUseCase] 호출
  *   3) offset commit (수동 — 처리 성공한 offset 만 commit, at-least-once)
  *
- * 처리 실패 시 메시지를 skip 하고 commit (DLQ 는 ADR-0004 에서 별도 논의). 단순화 — 본 repo
- * 는 *학습용* feed view 이므로 손실 가능성을 감내한다. 실제 운영 service 라면 retry topic
- * 패턴을 권장.
+ * 처리 실패 시 메시지를 skip 하고 commit (DLQ 는 ADR-0004 에서 별도 논의). 손실을 감내하는
+ * 단순화 — 실제 운영 service 에서는 retry topic 또는 DLQ 패턴을 도입한다.
  */
 @Component
 @ConditionalOnProperty(name = ["feed.kafka.enabled"], havingValue = "true", matchIfMissing = false)

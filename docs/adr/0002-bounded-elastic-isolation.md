@@ -22,8 +22,8 @@ blocking call 은 `Schedulers.boundedElastic()` 으로 격리한다.
 - **bounded**: 스레드 수 한도 (`10 × CPU`, 기본 약 200) 가 있다 → 폭주해도 JVM 이 OOM
   되거나 스레드 수가 폭증하지 않는다.
 - **elastic**: 필요할 때 늘었다가 idle 하면 줄어든다 (60초 idle 기본).
-- **caller-runs 거부**: bounded 한도 초과 시 `RejectedExecutionException` 으로 즉시
-  실패 → caller 가 cb / fallback 으로 처리할 수 있다.
+- **한도 초과 시 즉시 실패**: bounded 한도를 넘으면 `RejectedExecutionException` 이 던져진다
+  → caller 가 circuit breaker / fallback 으로 처리할 수 있다.
 
 ### parallel 과의 차이
 

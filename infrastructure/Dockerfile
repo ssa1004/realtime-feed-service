@@ -1,4 +1,4 @@
-# 멀티 스테이지 — JDK 21 build → JRE 21 runtime. 100% Kotlin 이지만 toolchain 은 JVM.
+# 멀티 스테이지 — JDK 21 build → JRE 21 runtime.
 FROM eclipse-temurin:21-jdk-alpine AS build
 
 WORKDIR /app

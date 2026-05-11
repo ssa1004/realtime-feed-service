@@ -4,14 +4,13 @@
 [`resell-orderbook`](https://github.com/ssa1004/resell-orderbook) 이 발행하는
 체결 이벤트를 Kafka 로 consume 해서, SKU 단위 hot stream 으로 multicast 합니다.
 
-본 레포는 portfolio set 안에서 *유일하게 100% Kotlin reactive* 로 작성된 도메인입니다.
-다른 8 레포가 의도적으로 Spring MVC + JPA 를 고른 것과 대비됩니다 — "왜 reactive 를
-쓰지 말아야 하는가" 의 기준은 [ADR-0008](docs/adr/0008-when-not-to-use-reactive.md) 에
-정리되어 있습니다.
+portfolio 안의 다른 레포는 Spring MVC + JPA 인 반면, 본 레포는 Kotlin coroutines +
+Spring WebFlux 로 구성되어 있습니다 — "언제 reactive 를 쓰지 말아야 하는가" 의 기준은
+[ADR-0008](docs/adr/0008-when-not-to-use-reactive.md) 에 정리되어 있습니다.
 
 ## 기술 스택
 
-- **Language**: Kotlin 2.0 (100% — Java 0줄), Java 21 toolchain
+- **Language**: Kotlin 2.0, Java 21 toolchain
 - **Framework**: Spring Boot 3.4, Spring WebFlux (functional `coRouter`)
 - **Concurrency**: Kotlin Coroutines (`suspend` / `Flow` / `StateFlow` / `Channel`),
   Project Reactor (`Mono` / `Flux` / `Sinks`)
@@ -198,13 +197,13 @@ helm upgrade --install realtime-feed-service ./helm/realtime-feed-service \
 
 ## Portfolio Set 통합
 
-이 레포는 단독으로도 동작하지만, 같은 사용자가 운영하는 9 개 백엔드 레포가 한 시스템처럼
+이 레포는 단독으로도 동작하지만, 같은 사용자가 운영하는 백엔드 레포들이 한 시스템처럼
 맞물리는 구성의 일부입니다. 프로필 README:
 <https://github.com/ssa1004>.
 
-### 9 레포 한눈 표
+### 인접 레포와의 관계
 
-| 레포 | 역할 | 본 레포 (realtime-feed-service) 와의 관계 |
+| 레포 | 역할 | 본 레포와의 관계 |
 |---|---|---|
 | `auth-service` | 사용자 인증 + JWT 발급 | 본 레포가 JWK Set 으로 들어오는 JWT 를 검증 |
 | `security-log-search` | 보안 로그 수집/검색 | 본 레포의 인증 실패 / 권한 위반 로그를 인덱싱 (선택) |
@@ -212,7 +211,6 @@ helm upgrade --install realtime-feed-service ./helm/realtime-feed-service \
 | `search-service` | 상품 검색 | 본 레포가 수집한 체결 이력을 검색에 노출 (향후) |
 | `billing-platform` | 사용량 과금 | WebSocket 활성 connection 수를 usage 로 전송 (향후) |
 | `resell-orderbook` | 한정판 리셀 마켓 백엔드 | 본 레포의 upstream — `market.tradematched` 토픽을 본 레포가 consume |
-| **`realtime-feed-service`** | **본 레포 — 실시간 호가/체결 feed (Kotlin reactive)** | — |
 | `gpu-job-orchestrator` | GPU job 스케줄러 | 본 레포는 직접 통합 없음 |
 | `mini-shop-observability` | 관측 스택 | 본 레포의 metrics / trace / log 수집 |
 
