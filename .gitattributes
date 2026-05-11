@@ -1,0 +1,47 @@
+# 줄바꿈 정규화 — 작업 OS 와 무관하게 repo 안 텍스트는 LF.
+* text=auto eol=lf
+
+# Windows native 스크립트
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+# Shell / Gradle wrapper
+*.sh        text eol=lf
+gradlew     text eol=lf
+gradlew.bat text eol=crlf
+
+# 빌드 / 설정
+*.kt        text diff=kotlin
+*.kts       text diff=kotlin
+*.java      text diff=java
+*.gradle    text
+*.properties text
+*.yml       text
+*.yaml      text
+*.json      text
+*.md        text diff=markdown
+*.sql       text diff=sql
+
+# Helm / k8s
+*.tpl       text
+
+# 바이너리 — diff / merge 회피
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.pdf       binary
+*.zip       binary
+*.tar       binary
+*.tar.gz    binary
+*.jar       binary
+*.war       binary
+*.class     binary
+
+# linguist — GitHub 언어 통계에서 제외 (생성물 / 외부 도구)
+gradlew         linguist-vendored
+gradlew.bat     linguist-vendored
+gradle/wrapper/* linguist-vendored
+helm/**/*.tpl   linguist-generated
+docs/**         linguist-documentation
