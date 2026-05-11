@@ -1,0 +1,46 @@
+# EditorConfig — https://editorconfig.org
+# Kotlin official style (kotlin.code.style=official 와 일치). IDE / editor 가 자동으로
+# 따르도록 한다.
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+max_line_length = 120
+
+[*.{kt,kts}]
+# Kotlin official: 4 spaces, 120 col, ktlint 호환.
+indent_size = 4
+ij_kotlin_code_style_defaults = KOTLIN_OFFICIAL
+ij_kotlin_imports_layout = *
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+
+[*.{yml,yaml}]
+indent_size = 2
+max_line_length = off
+
+[*.{json,json5}]
+indent_size = 2
+
+[*.md]
+# Markdown 은 trailing space 가 줄바꿈 의미가 있어 trim 하지 않는다.
+trim_trailing_whitespace = false
+max_line_length = off
+
+[Makefile]
+indent_style = tab
+
+[*.sh]
+indent_size = 2
+
+[Dockerfile*]
+indent_size = 2
+
+[gradle.properties]
+indent_size = 2

@@ -1,5 +1,12 @@
 # Realtime Feed Service
 
+[![CI](https://github.com/ssa1004/realtime-feed-service/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ssa1004/realtime-feed-service/actions/workflows/ci.yml)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org/)
+[![Java](https://img.shields.io/badge/Java-21-007396?logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.x-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Gradle](https://img.shields.io/badge/Gradle-8.10-02303A?logo=gradle&logoColor=white)](https://gradle.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 리셀 마켓의 실시간 호가/체결 feed 를 WebSocket 과 SSE 로 fan-out 하는 백엔드입니다.
 [`resell-orderbook`](https://github.com/ssa1004/resell-orderbook) 이 발행하는
 체결 이벤트를 Kafka 로 consume 해서, SKU 단위 hot stream 으로 multicast 합니다.
@@ -169,7 +176,8 @@ dev 프로필은 인증을 우회하고 Kafka consumer 도 비활성 — 단순 
 - `infrastructure/Dockerfile` — multi-stage 빌드 (JDK 21 build → JRE 21 distroless), non-root.
 - `infrastructure/docker-compose.yml` — 로컬 통합 환경 (postgres + redis + kafka + 본 앱).
 - `helm/realtime-feed-service/` — Kubernetes 배포용 Helm chart (`values.yaml` + `values-prod.yaml`).
-- `.github/workflows/ci.yml` — 단위 테스트 → 정적 분석 → 이미지 빌드 + Trivy 스캔 (계획).
+- `.github/workflows/ci.yml` — 단위 테스트 + Helm chart lint → (push 시) GHCR 이미지
+  빌드 + Trivy `HIGH,CRITICAL` 스캔. 현재는 `workflow_dispatch` 수동 trigger.
 
 ### Helm chart
 
@@ -271,4 +279,5 @@ docker compose -p feed-integration -f infrastructure/docker-compose.yml down -v
 - WebSocket 의 client-driven backpressure — flow control 메시지 도입.
 - 다중 instance scale-out — sink 가 instance 별로 분리되므로 SKU sharding 또는 Redis
   pub/sub 로 instance 간 fan-out 동기화 필요.
-- Trivy / dependency-track 기반 SBOM 자동 생성.
+- 이미지 Trivy 스캔은 CI 에 포함됨 (HIGH/CRITICAL fail). dependency-track 기반 SBOM
+  (CycloneDX / SPDX) 자동 생성은 향후 추가 예정.
