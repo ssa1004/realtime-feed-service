@@ -1,6 +1,6 @@
 apiVersion: v2
 name: realtime-feed-service
-description: 리셀 마켓 실시간 호가/체결 feed (WebSocket + SSE, 100% Kotlin reactive) 의 Helm chart
+description: 리셀 마켓 실시간 호가/체결 feed (WebSocket + SSE, Kotlin coroutines + WebFlux) 의 Helm chart
 type: application
 # 본 레포의 애플리케이션 버전과 chart 버전은 분리. appVersion 은 컨테이너 이미지 태그의
 # 기본값으로도 쓰이므로 image.tag 를 비우면 이 값이 채워진다.

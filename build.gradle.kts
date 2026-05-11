@@ -1,5 +1,5 @@
-// 루트 빌드 — 100% Kotlin reactive. 본 repo 는 Java 코드를 의도적으로 0 줄 유지.
-// Java toolchain 은 JVM 21 만 사용 (Kotlin 컴파일 결과물의 target).
+// 루트 빌드 — 본 repo 는 Kotlin 만 사용하며 Java 파일은 추가하지 않는다.
+// Java toolchain 은 JVM 21 (Kotlin 컴파일 결과물의 target).
 plugins {
     kotlin("jvm") version "2.0.21" apply false
     kotlin("plugin.spring") version "2.0.21" apply false

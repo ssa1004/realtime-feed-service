@@ -29,8 +29,8 @@ coroutine 의 핵심 가치는 *structured concurrency*: 자식 coroutine 의 li
   `IngestTradeMatchedUseCase` 에서 cache 저장 / 영속 저장 / sink fan-out 은 서로 독립.
 
 본 repo 의 `IngestTradeMatchedUseCase` 는 `coroutineScope` + 각 자식의 `runCatching`
-패턴으로 의도적으로 단순화 (supervisorScope 동등 효과를 명시적으로). 이유: structured
-concurrency 의 hierarchy 를 명확히 보여주는 게 학습 가치.
+패턴으로 의도적으로 단순화했다 (supervisorScope 와 동등한 효과를 명시적으로 표현).
+이렇게 두면 structured concurrency 의 hierarchy 가 코드만 봐도 분명하게 드러난다.
 
 ### 2. timeout — withTimeout vs withTimeoutOrNull
 
