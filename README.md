@@ -251,13 +251,13 @@ docker compose -p feed-integration -f infrastructure/docker-compose.yml \
 | `billing-platform` | 사용량 과금 | WebSocket 활성 connection 수를 usage 로 전송 (향후) |
 | `resell-orderbook` | 한정판 리셀 마켓 백엔드 | 본 레포의 upstream — `market.tradematched` 토픽을 본 레포가 consume |
 | `gpu-job-orchestrator` | GPU job 스케줄러 | 본 레포는 직접 통합 없음 |
-| `mini-shop-observability` | 관측 스택 | 본 레포의 metrics / trace / log 수집 |
+| `commerce-ops` | 관측 스택 | 본 레포의 metrics / trace / log 수집 |
 
 ### 들어오는 / 나가는 통합점
 
 - **들어오는** — `auth-service` JWT 로 인증된 클라이언트가 SSE / WebSocket 구독.
   Kafka 의 `market.tradematched` topic 을 `resell-orderbook` 으로부터 consume.
-- **나가는** — Micrometer Observation 의 trace 가 `mini-shop-observability` 의 Tempo 로
+- **나가는** — Micrometer Observation 의 trace 가 `commerce-ops` 의 Tempo 로
   전송 (Reactor Hooks.enableAutomaticContextPropagation 으로 자동 전파, ADR-0005).
 
 ### 사용자 라이프사이클 sequence (호가 → 체결 → 실시간 feed)

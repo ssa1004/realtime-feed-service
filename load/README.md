@@ -216,7 +216,7 @@ upstream produce 속도를 `K6_EXPECTED_RATE=50` 으로 올리면 `ws_bp_drop_ra
 ## 더 나아가려면
 
 - 5 시나리오의 결과를 `build/k6-reports/*.json` 으로 떨궈서 dashboard 에 plot 한다.
-- `mini-shop-observability` 의 Prometheus remote-write 로 `k6 → Prom → Grafana` 도
+- `commerce-ops` 의 Prometheus remote-write 로 `k6 → Prom → Grafana` 도
   가능 — `--out experimental-prometheus-rw=http://prom:9090/api/v1/write`.
 - 더 큰 부하는 k6 cloud / k6 distributed mode 가 필요 — 본 시나리오는 single-node
   기준이라 VU 100 ~ 200 선에서 운용한다.
