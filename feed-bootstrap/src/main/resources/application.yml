@@ -53,6 +53,10 @@ feed:
   stream:
     sample-window-ms: 100
     catch-up-limit: 50
+  security:
+    # WebSocket / SSE handshake 시 허용할 Origin 화이트리스트 (콤마 구분).
+    # 비어 있으면 Origin 헤더가 붙은 모든 요청은 403 — 브라우저 외 호출만 통과.
+    allowed-origins: ${FEED_ALLOWED_ORIGINS:}
 
 logging:
   level:

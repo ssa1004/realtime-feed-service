@@ -51,6 +51,7 @@ private vulnerability reporting 으로 보고해 주세요. 공개 issue 로 올
   주석 참고). adapter 에서 들어온 raw 데이터를 도메인 값객체로 변환하며 invariant 검증.
 
 자세한 reactive 컨벤션은 `docs/adr/` 의 ADR-0001 ~ ADR-0010 을 참고하세요.
+항목별 OWASP API Top 10 (2023) 매핑은 [`docs/security/owasp-mapping.md`](docs/security/owasp-mapping.md) 을 참고하세요.
 
 ## 의존성 / SBOM
 

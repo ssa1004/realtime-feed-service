@@ -17,6 +17,7 @@ data:
   KAFKA_BOOTSTRAP: {{ .Values.kafka.bootstrapServers | quote }}
   KAFKA_TOPIC_TRADE_MATCHED: {{ .Values.kafka.topicTradeMatched | quote }}
   OAUTH_JWK_SET_URI: {{ .Values.oauth.jwkSetUri | quote }}
+  FEED_ALLOWED_ORIGINS: {{ .Values.security.allowedOrigins | quote }}
   {{- range $k, $v := .Values.extraEnv }}
   {{ $k }}: {{ $v | quote }}
   {{- end }}

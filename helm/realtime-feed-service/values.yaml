@@ -186,6 +186,11 @@ kafka:
 oauth:
   jwkSetUri: http://auth-service.auth.svc.cluster.local:8080/.well-known/jwks.json
 
+# WebSocket / SSE handshake 의 Origin 화이트리스트 — 콤마 구분.
+# 비어 있으면 Origin 헤더가 있는 모든 cross-site 호출은 403. server-to-server 는 통과.
+security:
+  allowedOrigins: ""
+
 # 추가 환경 변수 (자유 주입). configMap 으로 들어간다.
 extraEnv: {}
 

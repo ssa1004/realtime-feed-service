@@ -11,7 +11,9 @@ import org.springframework.security.web.server.SecurityWebFilterChain
 // Spring Security Reactive 설정 — auth-service 의 JWK Set 으로 JWT 검증.
 //
 // 보호 정책:
-//   - /actuator/** 는 모두 허용 (운영자 / k8s probes).
+//   - /actuator/health/** 는 모두 허용 (k8s liveness / readiness probes).
+//   - /actuator/info, /actuator/metrics, /actuator/prometheus 는 인증 필요
+//     (운영 metric / 빌드 정보 노출 차단 — OWASP API5 / API8).
 //   - /api/v1/feed/** 와 /ws/feed/** 는 인증 필요 (auth-service JWT).
 //
 // dev 프로필에서는 인증을 우회 — 통합 demo 용.
@@ -30,7 +32,9 @@ class SecurityConfig {
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
             .authorizeExchange {
-                it.pathMatchers("/actuator/**").permitAll()
+                // k8s probes 만 공개 — prometheus / metrics / info 는 인증 뒤로.
+                it.pathMatchers("/actuator/health", "/actuator/health/**").permitAll()
+                it.pathMatchers("/actuator/**").authenticated()
                 it.pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 it.pathMatchers("/api/v1/feed/**").authenticated()
                 it.pathMatchers("/ws/feed/**").authenticated()
