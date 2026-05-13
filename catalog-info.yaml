@@ -1,0 +1,152 @@
+---
+# Backstage Software Catalog 정의 — realtime-feed-service component + feed-websocket / feed-sse.
+# system 정의는 ssa1004/auth-service 레포에 있다.
+
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: realtime-feed-service
+  description: "실시간 호가/체결 feed 스트리밍 — 100% Kotlin + Spring WebFlux + Coroutines + R2DBC + Reactor Kafka + WebSocket/SSE + JWT"
+  annotations:
+    github.com/project-slug: ssa1004/realtime-feed-service
+    backstage.io/source-location: url:https://github.com/ssa1004/realtime-feed-service
+  tags:
+    - websocket
+    - server-sent-events
+    - spring-webflux
+    - coroutines
+    - reactor-kafka
+    - backpressure
+    - kotlin
+  links:
+    - url: https://github.com/ssa1004/realtime-feed-service
+      title: GitHub Repository
+    - url: https://github.com/ssa1004/realtime-feed-service/blob/main/README.md
+      title: README
+    - url: https://github.com/ssa1004/realtime-feed-service/tree/main/docs/adr
+      title: ADRs
+spec:
+  type: service
+  lifecycle: experimental
+  owner: user:ssa1004
+  system: ssa1004-portfolio
+  providesApis:
+    - feed-websocket
+    - feed-sse
+  consumesApis:
+    - resell-orderbook-trade-events
+  dependsOn:
+    - component:auth-service
+    - component:resell-orderbook
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: feed-websocket
+  description: "실시간 호가 / 체결 WebSocket feed — 양방향, 채널 구독 (JWT 인증)"
+  annotations:
+    github.com/project-slug: ssa1004/realtime-feed-service
+spec:
+  type: asyncapi
+  lifecycle: experimental
+  owner: user:ssa1004
+  system: ssa1004-portfolio
+  definition: |
+    asyncapi: 2.6.0
+    info:
+      title: Realtime Feed WebSocket API
+      version: 1.0.0
+      description: |
+        WebSocket 기반 실시간 호가 / 체결 push feed.
+        클라이언트는 SUBSCRIBE / UNSUBSCRIBE 로 채널 (예: orderbook.{productId}, trades.{productId}) 을 구독.
+    servers:
+      production:
+        url: wss://feed.example.com/ws
+        protocol: wss
+    channels:
+      ws/orderbook.{productId}:
+        parameters:
+          productId:
+            schema: { type: string }
+        subscribe:
+          message:
+            name: OrderbookSnapshotOrDelta
+            payload:
+              type: object
+              properties:
+                type: { type: string, enum: [SNAPSHOT, DELTA] }
+                bids: { type: array, items: { type: object } }
+                asks: { type: array, items: { type: object } }
+                seq: { type: integer }
+      ws/trades.{productId}:
+        parameters:
+          productId:
+            schema: { type: string }
+        subscribe:
+          message:
+            name: TradeTick
+            payload:
+              type: object
+              required: [tradeId, executedAt, price, quantity]
+              properties:
+                tradeId: { type: string }
+                executedAt: { type: string, format: date-time }
+                price: { type: integer }
+                quantity: { type: integer }
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: feed-sse
+  description: "실시간 호가 / 체결 SSE feed — 단방향 push, 폴리필 / 모바일 친화 (JWT 인증)"
+  annotations:
+    github.com/project-slug: ssa1004/realtime-feed-service
+spec:
+  type: openapi
+  lifecycle: experimental
+  owner: user:ssa1004
+  system: ssa1004-portfolio
+  definition: |
+    openapi: 3.0.3
+    info:
+      title: Realtime Feed SSE API
+      version: 1.0.0
+      description: |
+        text/event-stream 기반 단방향 push feed. WebSocket 이 차단된 환경 / 폴리필 용.
+    paths:
+      /sse/orderbook/{productId}:
+        get:
+          summary: 호가 SSE stream
+          parameters:
+            - in: path
+              name: productId
+              required: true
+              schema: { type: string }
+            - in: header
+              name: Authorization
+              required: true
+              schema: { type: string, example: "Bearer <jwt>" }
+          responses:
+            "200":
+              description: SSE stream
+              content:
+                text/event-stream: {}
+      /sse/trades/{productId}:
+        get:
+          summary: 체결 SSE stream
+          parameters:
+            - in: path
+              name: productId
+              required: true
+              schema: { type: string }
+            - in: header
+              name: Authorization
+              required: true
+              schema: { type: string }
+          responses:
+            "200":
+              description: SSE stream
+              content:
+                text/event-stream: {}
