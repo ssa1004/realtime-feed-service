@@ -35,7 +35,7 @@ JPA 의 lazy loading 이 핵심 가치인 경우 reactive 와 어울리지 않�
 다단계 transaction, savepoint, isolation level 조정이 빈번한 도메인 (금융 거래 등).
 R2DBC 의 transaction API 는 JDBC 보다 즉답성이 부족 (예: nested transaction, REQUIRES_NEW
 의 보장 정도). 코드 복잡도 증가.
-- 대안: Spring MVC + JDBC + JPA 의 `@Transactional`. resell-orderbook 의 saga 가 그
+- 대안: Spring MVC + JDBC + JPA 의 `@Transactional`. bid-ask-marketplace 의 saga 가 그
   사례.
 
 #### 5. blocking 의존성이 필수

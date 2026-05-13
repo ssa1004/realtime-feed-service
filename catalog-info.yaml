@@ -34,10 +34,10 @@ spec:
     - feed-websocket
     - feed-sse
   consumesApis:
-    - resell-orderbook-trade-events
+    - bid-ask-marketplace-trade-events
   dependsOn:
     - component:auth-service
-    - component:resell-orderbook
+    - component:bid-ask-marketplace
 
 ---
 apiVersion: backstage.io/v1alpha1
