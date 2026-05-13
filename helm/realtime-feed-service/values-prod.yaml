@@ -53,3 +53,7 @@ postgres:
   password: ""  # 평문 password 비활성 — existingSecret 으로
   existingSecret: feed-postgres
   existingSecretPasswordKey: password
+
+# 운영에선 ingress 도메인을 명시 — Origin 화이트리스트.
+security:
+  allowedOrigins: "https://feed.example.com"
