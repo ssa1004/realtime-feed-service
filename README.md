@@ -8,7 +8,7 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 리셀 마켓의 실시간 호가/체결 feed 를 WebSocket 과 SSE 로 fan-out 하는 백엔드입니다.
-[`resell-orderbook`](https://github.com/ssa1004/resell-orderbook) 이 발행하는
+[`bid-ask-marketplace`](https://github.com/ssa1004/bid-ask-marketplace) 가 발행하는
 체결 이벤트를 Kafka 로 consume 해서, SKU 단위 hot stream 으로 multicast 합니다.
 
 portfolio 안의 다른 레포는 Spring MVC + JPA 인 반면, 본 레포는 Kotlin coroutines +
@@ -32,7 +32,7 @@ Spring WebFlux 로 구성되어 있습니다 — "언제 reactive 를 쓰지 말
 
 본 service 가 다루는 핵심 흐름:
 
-1. `resell-orderbook` 의 거래 매칭이 Kafka topic `market.tradematched` 로 발행됨
+1. `bid-ask-marketplace` 의 거래 매칭이 Kafka topic `market.tradematched` 로 발행됨
 2. 본 service 의 Kafka consumer 가 receive → 도메인 [`FeedEvent.TradeMatched`](feed-domain/src/main/kotlin/com/example/feed/domain/FeedEvent.kt)
    로 변환
 3. SKU 별 hot stream (`Sinks.many().multicast().onBackpressureBuffer`) 에 emit
@@ -42,7 +42,7 @@ Spring WebFlux 로 구성되어 있습니다 — "언제 reactive 를 쓰지 말
 ```mermaid
 sequenceDiagram
     autonumber
-    participant RB as resell-orderbook
+    participant RB as bid-ask-marketplace
     participant K as Kafka
     participant Feed as realtime-feed-service
     participant DB as Postgres (R2DBC)
@@ -246,17 +246,17 @@ docker compose -p feed-integration -f infrastructure/docker-compose.yml \
 |---|---|---|
 | `auth-service` | 사용자 인증 + JWT 발급 | 본 레포가 JWK Set 으로 들어오는 JWT 를 검증 |
 | `security-log-search` | 보안 로그 수집/검색 | 본 레포의 인증 실패 / 권한 위반 로그를 인덱싱 (선택) |
-| `notification-hub` | 다채널 알림 | 본 레포는 직접 호출 없음 — 알림은 `resell-orderbook` 이 담당 |
+| `notification-hub` | 다채널 알림 | 본 레포는 직접 호출 없음 — 알림은 `bid-ask-marketplace` 가 담당 |
 | `search-service` | 상품 검색 | 본 레포가 수집한 체결 이력을 검색에 노출 (향후) |
 | `billing-platform` | 사용량 과금 | WebSocket 활성 connection 수를 usage 로 전송 (향후) |
-| `resell-orderbook` | 한정판 리셀 마켓 백엔드 | 본 레포의 upstream — `market.tradematched` 토픽을 본 레포가 consume |
+| `bid-ask-marketplace` | 한정판 리셀 마켓 백엔드 | 본 레포의 upstream — `market.tradematched` 토픽을 본 레포가 consume |
 | `gpu-job-orchestrator` | GPU job 스케줄러 | 본 레포는 직접 통합 없음 |
 | `commerce-ops` | 관측 스택 | 본 레포의 metrics / trace / log 수집 |
 
 ### 들어오는 / 나가는 통합점
 
 - **들어오는** — `auth-service` JWT 로 인증된 클라이언트가 SSE / WebSocket 구독.
-  Kafka 의 `market.tradematched` topic 을 `resell-orderbook` 으로부터 consume.
+  Kafka 의 `market.tradematched` topic 을 `bid-ask-marketplace` 로부터 consume.
 - **나가는** — Micrometer Observation 의 trace 가 `commerce-ops` 의 Tempo 로
   전송 (Reactor Hooks.enableAutomaticContextPropagation 으로 자동 전파, ADR-0005).
 
@@ -267,7 +267,7 @@ sequenceDiagram
     autonumber
     participant U as 사용자
     participant Auth as auth-service
-    participant RB as resell-orderbook
+    participant RB as bid-ask-marketplace
     participant K as Kafka
     participant Feed as realtime-feed-service
     participant Browser as 브라우저
@@ -301,7 +301,7 @@ docker compose -p feed-integration -f infrastructure/docker-compose.yml up -d --
 docker compose -p feed-integration -f infrastructure/docker-compose.yml down -v
 ```
 
-실제 `auth-service` / `resell-orderbook` 대신 같은 계약을 충족하는 stub 으로 닫혀 있어
+실제 `auth-service` / `bid-ask-marketplace` 대신 같은 계약을 충족하는 stub 으로 닫혀 있어
 한 머신에서 한 사이클을 마칠 수 있습니다.
 
 ## 향후 개선 사항

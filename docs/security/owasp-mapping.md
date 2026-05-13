@@ -18,7 +18,7 @@ backpressure, coroutine cancellation, Sinks subscriber 누수 같은 항목.
 |---|---|
 | `main` 브랜치의 코드 / 설정 / Helm chart | O |
 | `infrastructure/docker-compose.yml` 의 dev 통합 환경 | O (best-effort) |
-| 외부 의존 (auth-service, resell-orderbook, Kafka cluster, PG/Redis 클러스터) | X — 각자의 보안 정책 |
+| 외부 의존 (auth-service, bid-ask-marketplace, Kafka cluster, PG/Redis 클러스터) | X — 각자의 보안 정책 |
 | 운영 클러스터 (네트워크 / IAM / k8s RBAC) | X — 본 문서 범위 밖 |
 
 대응 강도 표기:
@@ -38,7 +38,7 @@ backpressure, coroutine cancellation, Sinks subscriber 누수 같은 항목.
 
 본 서비스가 다루는 데이터는 SKU 별 체결 / 호가 feed — 시장 데이터입니다. trader 개인의
 주문 / 보유 / 정산은 본 서비스가 보지 않습니다 (그 책임은
-[resell-orderbook](https://github.com/ssa1004/resell-orderbook) 와 별도 거래 서비스).
+[bid-ask-marketplace](https://github.com/ssa1004/bid-ask-marketplace) 와 별도 거래 서비스).
 
 - `/api/v1/feed/{skuId}/recent`, `/window`, `/stream`, `/ws/feed/{skuId}`
   → 응답에 `traderId` / 주문자 식별자 없음
