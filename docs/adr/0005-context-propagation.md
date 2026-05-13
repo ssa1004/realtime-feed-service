@@ -84,6 +84,6 @@ fun main(args: Array<String>) {
   unit test 로 traceId 가 살아 있는지 확인.
 
 ## 다시 검토할 시점
-- distributed tracing 백엔드 (Tempo / Jaeger) 와 통합 시 — `mini-shop-observability` 의
+- distributed tracing 백엔드 (Tempo / Jaeger) 와 통합 시 — `commerce-ops` 의
   Tempo 와 연결되는지 확인.
 - 새로운 컨텍스트 키 추가 시 — 키 이름과 lifecycle 을 본 ADR 에 갱신.
