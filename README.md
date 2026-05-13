@@ -203,6 +203,37 @@ helm upgrade --install realtime-feed-service ./helm/realtime-feed-service \
 | `feed-adapter-out` | ReactorFeedSink (StepVerifier 포함) | multicast fan-out, SKU 격리, mono { } boundary |
 | `feed-bootstrap` | Application smoke | main class 등록 |
 
+## Load test
+
+reactive push 흐름 (WebSocket fan-out, SSE, sample 백프레셔) 을 k6 로 검증한다. 5
+시나리오 — `websocket-fanout` / `sse-stream` / `rest-recent` / `rest-window` /
+`backpressure` — 가 [`load/k6/scenarios/`](load/k6/scenarios) 에 있다.
+
+```bash
+# 통합 환경이 떠 있는 상태에서
+./scripts/run-load.sh
+```
+
+스크립트는 로컬 `k6` 가 있으면 그것을, 없으면 `docker run grafana/k6` 를 사용한다.
+결과는 `build/k6-reports/{scenario}.json` 으로 떨군다.
+
+| 시나리오 | 검증 대상 | 주요 threshold |
+|---|---|---|
+| `websocket-fanout` | multicast fan-out (N 클라이언트 동시 구독) | `ws_connecting` p95 < 500ms, fail < 1% |
+| `sse-stream` | SSE 연결 안정성 + 첫 이벤트 latency | `sse_first_event_latency` p95 < 1000ms |
+| `rest-recent` | catch-up endpoint (cache hit 우세) | `http_req_duration` p95 < 100ms |
+| `rest-window` | VWAP 집계 (R2DBC 비용) | `http_req_duration` p95 < 200ms |
+| `backpressure` | slow consumer 의 sample 100ms 동작 | disconnect rate < 1%, drop 율 관측 |
+
+docker-compose 의 `k6` 서비스는 `--profile load` 일 때만 활성화된다.
+
+```bash
+docker compose -p feed-integration -f infrastructure/docker-compose.yml \
+    --profile load up k6
+```
+
+자세한 metric 해석 / 부하 모델 / 결과 예시는 [`load/README.md`](load/README.md) 참고.
+
 ## Portfolio Set 통합
 
 이 레포는 단독으로도 동작하지만, 같은 사용자가 운영하는 백엔드 레포들이 한 시스템처럼

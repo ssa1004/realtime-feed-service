@@ -62,3 +62,29 @@ services:
       KAFKA_BOOTSTRAP: kafka:9092
       OAUTH_JWK_SET_URI: "http://localhost:9999/.well-known/jwks.json"  # dev 우회
     ports: ["8088:8080"]
+
+  # k6 부하 시나리오 — profile=load 일 때만 활성.
+  #
+  # 컨테이너 안에서는 host 가 "feed:8080" 이지만, scripts/run-load.sh 가 호스트에서
+  # localhost:8088 로 실행하는 경로도 지원한다. README 의 'Load test' 절 참고.
+  #
+  # 띄우는 법:
+  #   docker compose -p feed-integration -f infrastructure/docker-compose.yml \
+  #       --profile load up k6
+  #
+  # 한 시나리오만:
+  #   docker compose ... --profile load run --rm k6 run /scripts/websocket-fanout.js
+  k6:
+    image: grafana/k6:0.50.0
+    profiles: ["load"]
+    depends_on:
+      feed: { condition: service_started }
+    environment:
+      BASE_URL: "http://feed:8080"
+      WS_URL: "ws://feed:8080"
+      K6_TOKEN: ""
+      K6_OUT: ""
+    volumes:
+      - ../load/k6:/scripts:ro
+    # 기본으로는 rest-recent 만 한 번 — 5종 풀세트는 scripts/run-load.sh 에서.
+    command: ["run", "/scripts/scenarios/rest-recent.js"]
