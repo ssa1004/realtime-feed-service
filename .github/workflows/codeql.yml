@@ -1,0 +1,50 @@
+name: CodeQL
+
+# Kotlin SAST — CodeQL 의 java-kotlin 분석기로 본 repo (100% Kotlin) 를 스캔한다.
+# push / PR 시 + 주 1회 정기 스캔. 결과는 GitHub Security 탭의 Code scanning alerts.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # 매주 월요일 06:00 UTC (KST 15:00) — dependabot 과 같은 요일.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  analyze:
+    name: Analyze (java-kotlin)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      # CodeQL 의 java-kotlin 분석은 JVM 빌드를 따라간다 — CI 와 동일한 JDK 21.
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java-kotlin
+          build-mode: manual
+
+      # Kotlin only — 컴파일만 하면 CodeQL 이 코드 그래프를 추출한다 (테스트 컴파일 포함).
+      - name: Compile (Kotlin only)
+        run: ./gradlew --no-daemon compileKotlin compileTestKotlin
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:java-kotlin"
