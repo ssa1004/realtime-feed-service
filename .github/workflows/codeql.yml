@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       # CodeQL 의 java-kotlin 분석은 JVM 빌드를 따라간다 — CI 와 동일한 JDK 21.
       - name: Set up JDK 21
