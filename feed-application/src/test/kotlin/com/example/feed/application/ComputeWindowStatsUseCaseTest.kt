@@ -4,7 +4,7 @@ import com.example.feed.application.port.FeedEventStore
 import com.example.feed.application.usecase.ComputeWindowStatsUseCase
 import com.example.feed.domain.FeedEvent
 import com.example.feed.domain.Money
-import com.example.feed.domain.Sequence
+import com.example.feed.domain.FeedSequence
 import com.example.feed.domain.SkuId
 import com.example.feed.domain.TradeId
 import kotlinx.coroutines.flow.Flow
@@ -28,7 +28,7 @@ class ComputeWindowStatsUseCaseTest {
     private fun trade(price: Long, qty: Int, atSec: Long) = FeedEvent.TradeMatched(
         skuId = sku,
         occurredAt = fixedNow.minusSeconds(atSec),
-        sequence = Sequence(atSec),
+        sequence = FeedSequence(atSec),
         tradeId = TradeId(UUID.randomUUID()),
         price = Money(price),
         quantity = qty,

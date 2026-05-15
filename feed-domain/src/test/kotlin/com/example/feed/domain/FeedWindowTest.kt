@@ -13,7 +13,7 @@ class FeedWindowTest {
     private fun trade(price: Long, qty: Int, atSec: Long, seq: Long) = FeedEvent.TradeMatched(
         skuId = sku,
         occurredAt = now.plusSeconds(atSec),
-        sequence = Sequence(seq),
+        sequence = FeedSequence(seq),
         tradeId = TradeId(UUID.randomUUID()),
         price = Money(price),
         quantity = qty,

@@ -3,7 +3,7 @@ package com.example.feed.adapter.outbound.r2dbc
 import com.example.feed.application.port.FeedEventStore
 import com.example.feed.domain.FeedEvent
 import com.example.feed.domain.Money
-import com.example.feed.domain.Sequence
+import com.example.feed.domain.FeedSequence
 import com.example.feed.domain.SkuId
 import com.example.feed.domain.TradeId
 import io.r2dbc.spi.Row
@@ -117,6 +117,6 @@ class FeedEventR2dbcAdapter(
         price = Money(row.get("price_krw", java.lang.Long::class.java)!!.toLong()),
         quantity = row.get("quantity", Integer::class.java)!!.toInt(),
         occurredAt = row.get("occurred_at", Instant::class.java)!!,
-        sequence = Sequence(row.get("sequence", java.lang.Long::class.java)!!.toLong()),
+        sequence = FeedSequence(row.get("sequence", java.lang.Long::class.java)!!.toLong()),
     )
 }

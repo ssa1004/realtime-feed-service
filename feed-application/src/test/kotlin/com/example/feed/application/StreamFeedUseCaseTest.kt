@@ -5,7 +5,7 @@ import com.example.feed.application.port.FeedSink
 import com.example.feed.application.usecase.StreamFeedUseCase
 import com.example.feed.domain.FeedEvent
 import com.example.feed.domain.Money
-import com.example.feed.domain.Sequence
+import com.example.feed.domain.FeedSequence
 import com.example.feed.domain.SkuId
 import com.example.feed.domain.TradeId
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +25,7 @@ class StreamFeedUseCaseTest {
     private fun trade(seq: Long, price: Long) = FeedEvent.TradeMatched(
         skuId = sku,
         occurredAt = Instant.now(),
-        sequence = Sequence(seq),
+        sequence = FeedSequence(seq),
         tradeId = TradeId(UUID.randomUUID()),
         price = Money(price),
         quantity = 1,

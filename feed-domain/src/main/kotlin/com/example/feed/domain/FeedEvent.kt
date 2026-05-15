@@ -11,7 +11,7 @@ import java.time.Instant
 sealed interface FeedEvent {
     val skuId: SkuId
     val occurredAt: Instant
-    val sequence: Sequence
+    val sequence: FeedSequence
 
     /**
      * 체결 이벤트. resell-orderbook 의 `trade.matched` 토픽이 1:1 로 매핑된다.
@@ -22,7 +22,7 @@ sealed interface FeedEvent {
     data class TradeMatched(
         override val skuId: SkuId,
         override val occurredAt: Instant,
-        override val sequence: Sequence,
+        override val sequence: FeedSequence,
         val tradeId: TradeId,
         val price: Money,
         val quantity: Int,
@@ -39,7 +39,7 @@ sealed interface FeedEvent {
     data class BidAskUpdated(
         override val skuId: SkuId,
         override val occurredAt: Instant,
-        override val sequence: Sequence,
+        override val sequence: FeedSequence,
         val snapshot: BidAskSnapshot,
     ) : FeedEvent
 
@@ -49,6 +49,6 @@ sealed interface FeedEvent {
     data class Heartbeat(
         override val skuId: SkuId,
         override val occurredAt: Instant,
-        override val sequence: Sequence,
+        override val sequence: FeedSequence,
     ) : FeedEvent
 }
