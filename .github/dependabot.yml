@@ -1,0 +1,38 @@
+# Dependabot — 의존성 / GitHub Actions 업데이트 자동 PR.
+# Gradle: 루트 build.gradle.kts 의 plugin / BOM 버전 + 각 모듈의 dependency.
+#   (Spring Boot BOM 으로 버전을 모으므로 대부분의 bump 은 BOM / plugin 라인에 모인다.)
+# GitHub Actions: .github/workflows/ 의 action 핀 버전.
+version: 2
+updates:
+  - package-ecosystem: gradle
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Seoul
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      # patch / minor 는 한 PR 로 묶어 노이즈를 줄인다. major 는 개별 PR.
+      gradle-minor-patch:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Seoul
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - ci
+    commit-message:
+      prefix: "chore(ci)"
