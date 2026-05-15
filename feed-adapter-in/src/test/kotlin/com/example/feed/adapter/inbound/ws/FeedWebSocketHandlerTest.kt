@@ -5,7 +5,7 @@ import com.example.feed.application.port.FeedSink
 import com.example.feed.application.usecase.StreamFeedUseCase
 import com.example.feed.domain.FeedEvent
 import com.example.feed.domain.Money
-import com.example.feed.domain.Sequence
+import com.example.feed.domain.FeedSequence
 import com.example.feed.domain.SkuId
 import com.example.feed.domain.TradeId
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -46,7 +46,7 @@ class FeedWebSocketHandlerTest {
     private val sampleEvent = FeedEvent.TradeMatched(
         skuId = sku,
         occurredAt = Instant.parse("2026-05-09T00:00:00Z"),
-        sequence = Sequence(1),
+        sequence = FeedSequence(1),
         tradeId = TradeId(UUID.randomUUID()),
         price = Money(150_000),
         quantity = 1,

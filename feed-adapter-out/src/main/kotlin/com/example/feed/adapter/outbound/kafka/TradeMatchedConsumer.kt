@@ -3,7 +3,7 @@ package com.example.feed.adapter.outbound.kafka
 import com.example.feed.application.usecase.IngestTradeMatchedUseCase
 import com.example.feed.domain.FeedEvent
 import com.example.feed.domain.Money
-import com.example.feed.domain.Sequence
+import com.example.feed.domain.FeedSequence
 import com.example.feed.domain.SkuId
 import com.example.feed.domain.TradeId
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -103,7 +103,7 @@ class TradeMatchedConsumer(
             price = Money(node["price"].asLong()),
             quantity = node["quantity"].asInt(),
             occurredAt = Instant.parse(node["occurredAt"].asText()),
-            sequence = Sequence(node["sequence"].asLong()),
+            sequence = FeedSequence(node["sequence"].asLong()),
         )
     }
 

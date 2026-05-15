@@ -2,7 +2,7 @@ package com.example.feed.adapter.outbound.sink
 
 import com.example.feed.domain.FeedEvent
 import com.example.feed.domain.Money
-import com.example.feed.domain.Sequence
+import com.example.feed.domain.FeedSequence
 import com.example.feed.domain.SkuId
 import com.example.feed.domain.TradeId
 import kotlinx.coroutines.async
@@ -19,7 +19,7 @@ class ReactorFeedSinkTest {
     private fun trade(sku: String, seq: Long) = FeedEvent.TradeMatched(
         skuId = SkuId(sku),
         occurredAt = Instant.now(),
-        sequence = Sequence(seq),
+        sequence = FeedSequence(seq),
         tradeId = TradeId(UUID.randomUUID()),
         price = Money(150_000),
         quantity = 1,

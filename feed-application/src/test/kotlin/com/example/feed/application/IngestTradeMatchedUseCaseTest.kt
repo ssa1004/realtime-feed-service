@@ -6,7 +6,7 @@ import com.example.feed.application.port.FeedSink
 import com.example.feed.application.usecase.IngestTradeMatchedUseCase
 import com.example.feed.domain.FeedEvent
 import com.example.feed.domain.Money
-import com.example.feed.domain.Sequence
+import com.example.feed.domain.FeedSequence
 import com.example.feed.domain.SkuId
 import com.example.feed.domain.TradeId
 import kotlinx.coroutines.flow.Flow
@@ -50,7 +50,7 @@ class IngestTradeMatchedUseCaseTest {
         val event = FeedEvent.TradeMatched(
             skuId = SkuId("NIKE-001"),
             occurredAt = Instant.parse("2026-05-09T00:00:00Z"),
-            sequence = Sequence(1),
+            sequence = FeedSequence(1),
             tradeId = TradeId(UUID.randomUUID()),
             price = Money(150_000),
             quantity = 1,
@@ -79,7 +79,7 @@ class IngestTradeMatchedUseCaseTest {
         val event = FeedEvent.TradeMatched(
             skuId = SkuId("NIKE-002"),
             occurredAt = Instant.now(),
-            sequence = Sequence(2),
+            sequence = FeedSequence(2),
             tradeId = TradeId(UUID.randomUUID()),
             price = Money(200_000),
             quantity = 1,

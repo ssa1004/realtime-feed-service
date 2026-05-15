@@ -28,8 +28,12 @@ value class TradeId(val value: UUID)
 
 /**
  * 단조 증가 시퀀스. SharedFlow replay 시 클라이언트가 마지막 본 위치 이후만 처리하도록 돕는다.
+ *
+ * 이름을 `Sequence` 가 아닌 `FeedSequence` 로 둔 이유 — `kotlin.sequences.Sequence` 가
+ * 모든 Kotlin 파일에 자동 import 되므로, 같은 이름의 도메인 타입을 쓰면 `.asSequence()`
+ * 같은 표준 API 를 같이 쓰는 파일에서 이름 충돌이 난다. 도메인 타입은 명시적 접두사로 분리한다.
  */
 @JvmInline
-value class Sequence(val value: Long) : Comparable<Sequence> {
-    override fun compareTo(other: Sequence): Int = value.compareTo(other.value)
+value class FeedSequence(val value: Long) : Comparable<FeedSequence> {
+    override fun compareTo(other: FeedSequence): Int = value.compareTo(other.value)
 }

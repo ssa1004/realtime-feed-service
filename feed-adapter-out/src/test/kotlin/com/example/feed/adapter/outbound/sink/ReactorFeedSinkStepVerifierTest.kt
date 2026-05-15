@@ -2,7 +2,7 @@ package com.example.feed.adapter.outbound.sink
 
 import com.example.feed.domain.FeedEvent
 import com.example.feed.domain.Money
-import com.example.feed.domain.Sequence
+import com.example.feed.domain.FeedSequence
 import com.example.feed.domain.SkuId
 import com.example.feed.domain.TradeId
 import kotlinx.coroutines.reactor.asFlux
@@ -23,7 +23,7 @@ class ReactorFeedSinkStepVerifierTest {
     private fun trade(seq: Long) = FeedEvent.TradeMatched(
         skuId = SkuId("STREAM-001"),
         occurredAt = Instant.now(),
-        sequence = Sequence(seq),
+        sequence = FeedSequence(seq),
         tradeId = TradeId(UUID.randomUUID()),
         price = Money(100_000),
         quantity = 1,
