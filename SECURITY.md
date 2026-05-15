@@ -53,9 +53,13 @@ private vulnerability reporting 으로 보고해 주세요. 공개 issue 로 올
 자세한 reactive 컨벤션은 `docs/adr/` 의 ADR-0001 ~ ADR-0010 을 참고하세요.
 항목별 OWASP API Top 10 (2023) 매핑은 [`docs/security/owasp-mapping.md`](docs/security/owasp-mapping.md) 을 참고하세요.
 
-## 의존성 / SBOM
+## 의존성 / SAST / SBOM
 
 - `./gradlew dependencies` 로 의존성 트리 확인.
+- 의존성 업데이트는 `.github/dependabot.yml` 이 gradle + github-actions 를 weekly 로
+  추적해 PR 을 올립니다.
+- 코드 SAST 는 `.github/workflows/codeql.yml` 의 CodeQL `java-kotlin` 분석 (push / PR +
+  주 1회). 결과는 GitHub Security 탭의 Code scanning alerts.
 - 운영 이미지에 대한 Trivy 스캔은 CI (`.github/workflows/ci.yml`) 의 `build-image`
   step 에서 `HIGH,CRITICAL` 만 fail 처리.
 - 향후 SBOM 자동 생성 (CycloneDX / SPDX) + dependency-track 연동은 README 의

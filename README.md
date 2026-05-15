@@ -178,6 +178,8 @@ dev 프로필은 인증을 우회하고 Kafka consumer 도 비활성 — 단순 
 - `helm/realtime-feed-service/` — Kubernetes 배포용 Helm chart (`values.yaml` + `values-prod.yaml`).
 - `.github/workflows/ci.yml` — 단위 테스트 + Helm chart lint → (push 시) GHCR 이미지
   빌드 + Trivy `HIGH,CRITICAL` 스캔. 현재는 `workflow_dispatch` 수동 trigger.
+- `.github/workflows/codeql.yml` — CodeQL `java-kotlin` SAST. push / PR + 주 1회 정기 스캔.
+- `.github/dependabot.yml` — gradle + github-actions 의존성 weekly 업데이트 PR.
 
 ### Helm chart
 
@@ -310,5 +312,5 @@ docker compose -p feed-integration -f infrastructure/docker-compose.yml down -v
 - WebSocket 의 client-driven backpressure — flow control 메시지 도입.
 - 다중 instance scale-out — sink 가 instance 별로 분리되므로 SKU sharding 또는 Redis
   pub/sub 로 instance 간 fan-out 동기화 필요.
-- 이미지 Trivy 스캔은 CI 에 포함됨 (HIGH/CRITICAL fail). dependency-track 기반 SBOM
-  (CycloneDX / SPDX) 자동 생성은 향후 추가 예정.
+- 의존성 / SAST 는 dependabot + CodeQL 로, 이미지 취약점은 Trivy (HIGH/CRITICAL fail) 로
+  커버됨. dependency-track 기반 SBOM (CycloneDX / SPDX) 자동 생성은 향후 추가 예정.
