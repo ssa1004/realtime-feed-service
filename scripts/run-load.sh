@@ -24,8 +24,20 @@ WS_URL="${WS_URL:-ws://localhost:8088}"
 K6_TOKEN="${K6_TOKEN:-}"
 K6_EXPECTED_RATE="${K6_EXPECTED_RATE:-10}"
 
+# k6 → Prometheus remote-write (optional). commerce-ops Prometheus 가 떠 있을 때
+# `K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9090/api/v1/write` 를 export 하면
+# 각 시나리오 결과가 `service=realtime-feed-service` tag 와 함께 Prom 으로 흐른다.
+# 비어 있으면 기존처럼 콘솔 + summary JSON 만.
+K6_PROMETHEUS_RW_SERVER_URL="${K6_PROMETHEUS_RW_SERVER_URL:-}"
+K6_RW_TREND_STATS="${K6_RW_TREND_STATS:-p(95),p(99),min,max,avg}"
+K6_RW_PUSH_INTERVAL="${K6_RW_PUSH_INTERVAL:-5s}"
+SERVICE_TAG="realtime-feed-service"
+
 echo "==> base url: $BASE_URL"
 echo "==> ws url:   $WS_URL"
+if [[ -n "$K6_PROMETHEUS_RW_SERVER_URL" ]]; then
+    echo "==> k6 → Prometheus RW: $K6_PROMETHEUS_RW_SERVER_URL (service=$SERVICE_TAG)"
+fi
 
 # 1) healthcheck
 echo
@@ -61,12 +73,18 @@ elif command -v docker >/dev/null 2>&1; then
         BASE_URL_DOCKER="$BASE_URL"
         WS_URL_DOCKER="$WS_URL"
     fi
+    # docker 모드에서는 host 의 localhost:9090 도 host.docker.internal 로 치환해야 한다.
+    K6_RW_URL_DOCKER="${K6_PROMETHEUS_RW_SERVER_URL//localhost/host.docker.internal}"
+    K6_RW_URL_DOCKER="${K6_RW_URL_DOCKER//127.0.0.1/host.docker.internal}"
     K6_EXEC=(docker run --rm -i \
         -v "${ROOT_DIR}/load/k6:/scripts:ro" \
         -e "BASE_URL=${BASE_URL_DOCKER}" \
         -e "WS_URL=${WS_URL_DOCKER}" \
         -e "K6_TOKEN=${K6_TOKEN}" \
         -e "K6_EXPECTED_RATE=${K6_EXPECTED_RATE}" \
+        -e "K6_PROMETHEUS_RW_SERVER_URL=${K6_RW_URL_DOCKER}" \
+        -e "K6_PROMETHEUS_RW_TREND_STATS=${K6_RW_TREND_STATS}" \
+        -e "K6_PROMETHEUS_RW_PUSH_INTERVAL=${K6_RW_PUSH_INTERVAL}" \
         grafana/k6:0.50.0)
     SCRIPT_PREFIX="/scripts/scenarios"
     echo "==> docker run grafana/k6 사용"
@@ -84,17 +102,26 @@ run_scenario() {
     echo "==> [$name] start ($(date +%H:%M:%S))"
     local out="${REPORT_DIR}/${name}.json"
 
+    # k6 remote-write output 옵션 — env 가 있을 때만 활성.
+    local rw_opts=()
+    if [[ -n "$K6_PROMETHEUS_RW_SERVER_URL" ]]; then
+        rw_opts=(-o "experimental-prometheus-rw" \
+                 --tag "service=${SERVICE_TAG}" \
+                 --tag "scenario=${name}")
+    fi
+
     if [[ "${K6_EXEC[0]}" == "k6" ]]; then
-        export BASE_URL WS_URL K6_TOKEN K6_EXPECTED_RATE
+        export BASE_URL WS_URL K6_TOKEN K6_EXPECTED_RATE \
+               K6_PROMETHEUS_RW_SERVER_URL K6_PROMETHEUS_RW_TREND_STATS K6_PROMETHEUS_RW_PUSH_INTERVAL
         set +e
-        "${K6_EXEC[@]}" run --summary-export="$out" "$file"
+        "${K6_EXEC[@]}" run "${rw_opts[@]}" --summary-export="$out" "$file"
         local rc=$?
         set -e
     else
         local docker_file="${SCRIPT_PREFIX}/$(basename "$file")"
         # docker 경로에서는 summary-export 경로도 컨테이너 내부로 매핑해야 한다.
         set +e
-        "${K6_EXEC[@]}" run --summary-export="/scripts/${name}.summary.json" "$docker_file"
+        "${K6_EXEC[@]}" run "${rw_opts[@]}" --summary-export="/scripts/${name}.summary.json" "$docker_file"
         local rc=$?
         set -e
         # 호스트에서 결과가 보이도록 마운트 디렉토리에서 build 디렉토리로 옮긴다.

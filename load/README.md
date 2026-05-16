@@ -213,10 +213,27 @@ backpressure (slow consumer 50ms busy-wait)
 upstream produce 속도를 `K6_EXPECTED_RATE=50` 으로 올리면 `ws_bp_drop_ratio` 가 0.7
 부근으로 올라가야 한다 — sample 정책이 정상이라는 신호.
 
+## Prometheus remote-write 연동 (commerce-ops 통합 대시보드)
+
+5 시나리오 결과를 `commerce-ops` 의 Prometheus 로 흘려보내 한 Grafana 대시보드에서
+client load + server actuator 를 같이 보고 싶을 때:
+
+```bash
+# commerce-ops 를 먼저 띄운다 (Prom 의 --web.enable-remote-write-receiver 가 켜져 있음)
+docker compose -f /path/to/commerce-ops/infra/docker-compose.yml up -d prometheus grafana
+
+# remote-write target 을 export 하고 평소처럼 run
+export K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9090/api/v1/write
+./scripts/run-load.sh
+```
+
+`run-load.sh` 가 각 시나리오에 `service=realtime-feed-service` / `scenario=<name>` tag 를
+자동으로 부여한다. Grafana → **Portfolio Load (k6 + actuator)** 대시보드 (uid
+`portfolio-load`) 에서 `service` 변수를 `realtime-feed-service` 로 선택. 필요 k6 버전
+**0.42+** (experimental-prometheus-rw output).
+
 ## 더 나아가려면
 
 - 5 시나리오의 결과를 `build/k6-reports/*.json` 으로 떨궈서 dashboard 에 plot 한다.
-- `commerce-ops` 의 Prometheus remote-write 로 `k6 → Prom → Grafana` 도
-  가능 — `--out experimental-prometheus-rw=http://prom:9090/api/v1/write`.
 - 더 큰 부하는 k6 cloud / k6 distributed mode 가 필요 — 본 시나리오는 single-node
   기준이라 VU 100 ~ 200 선에서 운용한다.
