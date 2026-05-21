@@ -4,6 +4,9 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.spring")
     id("org.springframework.boot")
+    // OpenAPI spec build-time export — generateOpenApiDocs 가 앱을 부팅한 뒤
+    // /v3/api-docs 를 fetch 해 docs/openapi/realtime-feed-service.yaml 로 떨어뜨린다.
+    id("org.springdoc.openapi-gradle-plugin")
 }
 
 dependencies {
@@ -27,4 +30,15 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+}
+
+// OpenAPI spec export 설정 — ./gradlew :feed-bootstrap:generateOpenApiDocs.
+// 플러그인이 bootRun 으로 앱을 띄우고 apiDocsUrl 을 fetch 해 outputFileName 으로 저장한다.
+// 앱 부팅에 Postgres(R2DBC) / Kafka / Redis 가 필요하므로 로컬 단독 실행보다는 CI 에서
+// docker compose 와 함께 돌리는 것을 권장 (docs/openapi/README.md 참고).
+openApi {
+    apiDocsUrl.set("http://localhost:8080/v3/api-docs.yaml")
+    outputDir.set(layout.projectDirectory.dir("../docs/openapi"))
+    outputFileName.set("realtime-feed-service.yaml")
+    waitTimeInSeconds.set(120)
 }
