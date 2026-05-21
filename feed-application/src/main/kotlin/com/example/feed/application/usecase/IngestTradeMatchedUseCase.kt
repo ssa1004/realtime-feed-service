@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 /**
- * Use case — Kafka 에서 들어온 `trade.matched` 한 건을 처리한다.
+ * Use case — Kafka 의 `market.tradematched` 에서 들어온 체결 한 건을 처리한다.
  *
  * 1. 캐시 (Redis) 에 hot 데이터로 저장
  * 2. 영속 저장 (R2DBC)

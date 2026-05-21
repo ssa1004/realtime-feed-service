@@ -28,7 +28,7 @@ import java.time.Instant
 import java.util.UUID
 
 /**
- * resell-orderbook 이 발행하는 `trade.matched` 토픽 consumer.
+ * bid-ask-marketplace 가 발행하는 `market.tradematched` 토픽 consumer.
  *
  * Reactor Kafka 의 [KafkaReceiver] 를 쓴다 — Spring Kafka 와 달리 한 토픽 = 한 Flux 로
  * 추상화돼 backpressure 를 자연스럽게 다룰 수 있다 (ADR-0003).
@@ -89,7 +89,7 @@ class TradeMatchedConsumer(
     }
 
     /**
-     * resell-orderbook 의 outbox 메시지 형식 가정:
+     * bid-ask-marketplace 의 outbox 메시지 형식 가정:
      * ```
      * { "skuId": "...", "tradeId": "uuid", "price": 150000, "quantity": 1,
      *   "occurredAt": "2026-05-09T...", "sequence": 42 }

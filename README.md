@@ -238,11 +238,13 @@ docker compose -p feed-integration -f infrastructure/docker-compose.yml \
 
 ## Portfolio Set 통합
 
-이 레포는 단독으로도 동작하지만, 같은 사용자가 운영하는 백엔드 레포들이 한 시스템처럼
+이 레포는 단독으로도 동작하지만, 같은 사용자가 운영하는 10개 백엔드 레포가 한 시스템처럼
 맞물리는 구성의 일부입니다. 프로필 README:
 <https://github.com/ssa1004>.
 
 ### 인접 레포와의 관계
+
+본 레포를 제외한 나머지 9개 레포와의 관계입니다.
 
 | 레포 | 역할 | 본 레포와의 관계 |
 |---|---|---|
@@ -254,6 +256,7 @@ docker compose -p feed-integration -f infrastructure/docker-compose.yml \
 | `bid-ask-marketplace` | 한정판 리셀 마켓 백엔드 | 본 레포의 upstream — `market.tradematched` 토픽을 본 레포가 consume |
 | `gpu-job-orchestrator` | GPU job 스케줄러 | 본 레포는 직접 통합 없음 |
 | `commerce-ops` | 관측 스택 | 본 레포의 metrics / trace / log 수집 |
+| `graphql-gateway` | 통합 GraphQL 게이트웨이 | 본 레포의 REST 를 호출해 `Trade.feed` 필드로 노출 |
 
 ### 들어오는 / 나가는 통합점
 

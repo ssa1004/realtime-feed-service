@@ -93,7 +93,7 @@ authorization layer 추가.
 
 ## API4:2023 — Unrestricted Resource Consumption
 
-⭐ **본 서비스의 보안 중심.** long-lived WebSocket / SSE 와 hot stream multicast 라는
+**본 서비스의 보안 중심.** long-lived WebSocket / SSE 와 hot stream multicast 라는
 도메인 특성상 자원 고갈이 가장 현실적인 위협.
 
 **상태: 부분 대응 (잔여 위험 명시)**

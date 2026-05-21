@@ -6,7 +6,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: realtime-feed-service
-  description: "실시간 호가/체결 feed 스트리밍 — 100% Kotlin + Spring WebFlux + Coroutines + R2DBC + Reactor Kafka + WebSocket/SSE + JWT"
+  description: "실시간 호가/체결 feed 스트리밍 백엔드 — Spring WebFlux + Kotlin Coroutines + R2DBC + Reactor Kafka + WebSocket/SSE + JWT"
   annotations:
     github.com/project-slug: ssa1004/realtime-feed-service
     backstage.io/source-location: url:https://github.com/ssa1004/realtime-feed-service

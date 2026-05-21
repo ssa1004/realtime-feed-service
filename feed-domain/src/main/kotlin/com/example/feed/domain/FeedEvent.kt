@@ -14,9 +14,9 @@ sealed interface FeedEvent {
     val sequence: FeedSequence
 
     /**
-     * 체결 이벤트. resell-orderbook 의 `trade.matched` 토픽이 1:1 로 매핑된다.
+     * 체결 이벤트. bid-ask-marketplace 의 `market.tradematched` 토픽이 1:1 로 매핑된다.
      *
-     * @param price 체결가 (maker price 정책 — resell-orderbook 의 [MatchEngine] 참고)
+     * @param price 체결가 (maker price 정책 — bid-ask-marketplace 의 [MatchEngine] 참고)
      * @param quantity 체결 수량 (현재 도메인은 1 SKU 1 수량 가정이지만 미래 확장 위해 표현)
      */
     data class TradeMatched(
@@ -33,7 +33,7 @@ sealed interface FeedEvent {
     }
 
     /**
-     * 호가창 스냅샷 이벤트 (best ASK / best BID). resell-orderbook 의 `market.bidplaced` /
+     * 호가창 스냅샷 이벤트 (best ASK / best BID). bid-ask-marketplace 의 `market.bidplaced` /
      * `market.listingplaced` 등 호가 변동 이벤트의 결과로 갱신된다.
      */
     data class BidAskUpdated(

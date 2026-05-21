@@ -6,7 +6,7 @@ import java.text.NumberFormat
 import java.util.Locale
 
 /**
- * 금액 도메인 타입. 통화는 KRW 가정 (resell-orderbook 과 동일).
+ * 금액 도메인 타입. 통화는 KRW 가정 (bid-ask-marketplace 와 동일).
  *
  * 정수 단위 (원) 까지만 다루므로 내부 표현은 `Long`. 외부 노출용 포맷은 [formatKrw].
  */

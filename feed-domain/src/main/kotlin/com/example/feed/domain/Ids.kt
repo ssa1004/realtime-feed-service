@@ -21,7 +21,7 @@ value class SkuId(val value: String) {
 value class TraderId(val value: UUID)
 
 /**
- * 거래 식별자. resell-orderbook 의 Trade.id 와 동일한 의미를 가진다.
+ * 거래 식별자. bid-ask-marketplace 의 Trade.id 와 동일한 의미를 가진다.
  */
 @JvmInline
 value class TradeId(val value: UUID)
