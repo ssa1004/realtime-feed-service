@@ -13,6 +13,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 
+    // OpenAPI — WebFlux 용 springdoc. /v3/api-docs 노출 (functional routing 기반이라
+    // -webflux-api 만; Swagger UI 는 미포함). build-time spec export 에 사용.
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-api:2.8.6")
+
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
