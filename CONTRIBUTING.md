@@ -70,7 +70,7 @@ PR 전 `./gradlew check` 통과가 필수입니다. 모듈별로 빠르게 돌�
 ## 코드 스타일
 
 - Kotlin: official style (`kotlin.code.style=official` 가 `gradle.properties` 에).
-- 본 레포는 Kotlin 코드만 둔다 (AGENTS.md §4) — Java 파일 추가 금지.
+- 본 레포는 Kotlin 코드만 둔다 — Java 파일 추가 금지.
 - 주석 / 문서는 자연스러운 한국어 (영어 직역체 지양).
 - 도메인 모델은 `data class` + `val` (불변). value class (`@JvmInline`) 적극 사용.
 - sealed interface / sealed class 로 상태와 이벤트를 닫는다 (when exhaustive).
