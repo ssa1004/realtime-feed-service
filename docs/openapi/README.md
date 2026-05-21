@@ -34,4 +34,4 @@ commit 하거나 아티팩트로 업로드한다.
 ## 보는 법
 
 - Redoc — `npx @redocly/cli preview-docs docs/openapi/realtime-feed-service.yaml`
-- 통합 뷰어 — profile repo `ssa1004/ssa1004` 의 `docs/api/index.html` (9 service spec 드롭다운)
+- 통합 뷰어 — profile repo `ssa1004/ssa1004` 의 `docs/api/index.html` (11 service spec 드롭다운)
