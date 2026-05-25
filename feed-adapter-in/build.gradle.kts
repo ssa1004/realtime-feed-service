@@ -15,7 +15,7 @@ dependencies {
 
     // OpenAPI — WebFlux 용 springdoc. /v3/api-docs 노출 (functional routing 기반이라
     // -webflux-api 만; Swagger UI 는 미포함). build-time spec export 에 사용.
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-api:2.8.6")
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-api:3.0.3")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
