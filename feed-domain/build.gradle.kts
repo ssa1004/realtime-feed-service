@@ -9,7 +9,7 @@ dependencies {
     // 도메인 어휘로서의 Flow 만 허용 — Reactor 타입은 절대 import 금지.
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
 
-    testImplementation(platform("org.junit:junit-bom:5.11.3"))
+    testImplementation(platform("org.junit:junit-bom:6.1.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
