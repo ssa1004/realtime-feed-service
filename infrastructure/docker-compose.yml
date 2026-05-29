@@ -34,12 +34,18 @@ services:
       KAFKA_CFG_NODE_ID: "0"
       KAFKA_CFG_PROCESS_ROLES: "controller,broker"
       KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: "0@kafka:9093"
-      KAFKA_CFG_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093"
-      KAFKA_CFG_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      # 두 listener 로 분리 — 호스트에서 ./gradlew bootRun 으로 띄운 앱(localhost:9092)과
+      # 컨테이너 내부 서비스(kafka:29092)가 둘 다 붙을 수 있게.
+      #   EXTERNAL  : 호스트 → localhost:9092  (application.yml 기본값 KAFKA_BOOTSTRAP:localhost:9092 와 일치)
+      #   INTERNAL  : 컨테이너 끼리 → kafka:29092 (broker 간 통신도 INTERNAL)
+      # 단일 listener(advertised: kafka:9092)면 호스트가 kafka 호스트명을 못 풀어 Reactor Kafka consumer 가 hang/실패한다.
+      KAFKA_CFG_LISTENERS: "INTERNAL://:29092,EXTERNAL://:9092,CONTROLLER://:9093"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "INTERNAL://kafka:29092,EXTERNAL://localhost:9092"
       KAFKA_CFG_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
-      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: "INTERNAL"
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
       KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
-    ports: ["19092:9092"]
+    ports: ["9092:9092"]
 
   feed:
     build:
@@ -59,7 +65,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: "6379"
       KAFKA_ENABLED: "true"
-      KAFKA_BOOTSTRAP: kafka:9092
+      KAFKA_BOOTSTRAP: kafka:29092   # 컨테이너 끼리는 INTERNAL listener
       OAUTH_JWK_SET_URI: "http://localhost:9999/.well-known/jwks.json"  # dev 우회
     ports: ["8088:8080"]
 

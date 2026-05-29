@@ -92,6 +92,19 @@ graph LR
 
 ## Quick Start
 
+> `make help` 로 전체 명령을 볼 수 있습니다. 가장 빠른 길:
+> ```bash
+> make up        # 통합 인프라 기동 (postgres/redis/kafka + 앱 컨테이너)
+> make demo      # mock 체결 produce → catch-up/window 조회 → SSE/WS 가이드
+> make run       # (선택) 앱만 호스트에서 ./gradlew bootRun (:8080)
+> make clean     # 정지 + 볼륨 삭제
+> ```
+
+> **Kafka listener 설계**: 컨테이너끼리는 `kafka:29092` (INTERNAL), 호스트에서
+> `make run` (`./gradlew :feed-bootstrap:bootRun`) 으로 띄운 앱은 `localhost:9092`
+> (EXTERNAL) 로 붙습니다 — compose 의 두 listener. 단일 listener (`advertised: kafka:9092`)
+> 면 호스트가 `kafka` 호스트명을 못 풀어 Reactor Kafka consumer 가 무한 대기/실패합니다.
+
 ### 단일 모듈 단위 테스트
 
 ```bash
@@ -145,6 +158,9 @@ ws.onmessage = e => console.log(JSON.parse(e.data));
 ## 주요 설계 결정
 
 자세한 배경은 [docs/adr/](docs/adr/) 의 ADR 10건에 정리되어 있습니다.
+
+> 백엔드 패턴을 **공부 목적**으로 본다면 → [docs/backend-skills-index.md](docs/backend-skills-index.md):
+> 이 레포의 reactive 패턴을 "코드 위치 → 왜(ADR) → 이론([dev-lab](https://github.com/ssa1004/dev-lab))" 으로 잇는 학습 인덱스.
 
 | ADR | 주제 | 핵심 |
 |---|---|---|
