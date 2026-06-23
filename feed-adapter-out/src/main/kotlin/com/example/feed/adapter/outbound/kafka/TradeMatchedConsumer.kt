@@ -64,6 +64,8 @@ class TradeMatchedConsumer(
                 "key.deserializer" to "org.apache.kafka.common.serialization.StringDeserializer",
                 "value.deserializer" to "org.apache.kafka.common.serialization.StringDeserializer",
                 "enable.auto.commit" to "false",
+                // 실시간 feed 라 신규/리셋 컨슈머는 과거를 재생하지 않고 지금부터만 본다(earliest 아님).
+                // 과거 catch-up 은 Kafka 가 아니라 cache/store 책임 (StreamFeedUseCase).
                 "auto.offset.reset" to "latest",
             )
         ).subscription(listOf(topic))

@@ -39,6 +39,8 @@ class FeedRedisCacheAdapter(
                 .add(key, payload, event.sequence.value.toDouble())
                 .awaitSingleOrNull()
             // 최근 MAX_CACHE_SIZE 건만 유지 — 더 오래된 score 의 멤버 제거.
+            // end 가 음수인 건 ZREMRANGEBYRANK 의 음수 rank (뒤에서 N 번째) — rank 오름차순에서
+            // [0, -(N+1)] 은 "상위 N 개를 뺀 나머지", 즉 가장 오래된 것부터 잘라 N 건만 남긴다.
             redis.opsForZSet()
                 .removeRange(key, org.springframework.data.domain.Range.closed(0L, -(MAX_CACHE_SIZE + 1)))
                 .awaitSingleOrNull()
