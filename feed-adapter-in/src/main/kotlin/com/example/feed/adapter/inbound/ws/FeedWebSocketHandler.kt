@@ -37,6 +37,8 @@ class FeedWebSocketConfig(
     @Bean
     fun feedHandlerMapping(): HandlerMapping {
         val mapping = mapOf("/ws/feed/**" to handler)
+        // order = -1 — WebFlux 의 기본 RequestMapping/router handler mapping(보통 order >= 0)보다
+        // 먼저 매칭돼야 /ws/feed/** 핸드셰이크가 일반 라우터에 가로채이지 않는다.
         return SimpleUrlHandlerMapping(mapping, /* order = */ -1)
     }
 }

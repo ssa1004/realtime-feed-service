@@ -35,6 +35,8 @@ class SecurityConfig {
                 // k8s probes 만 공개 — prometheus / metrics / info 는 인증 뒤로.
                 it.pathMatchers("/actuator/health", "/actuator/health/**").permitAll()
                 it.pathMatchers("/actuator/**").authenticated()
+                // CORS preflight(OPTIONS)는 Authorization 헤더를 싣지 않으므로 인증 전에 통과시켜야
+                // 브라우저가 본 요청을 보낼 수 있다 — 아래 denyAll 에 막히지 않게 두는 의도적 예외.
                 it.pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 it.pathMatchers("/api/v1/feed/**").authenticated()
                 it.pathMatchers("/ws/feed/**").authenticated()
