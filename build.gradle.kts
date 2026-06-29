@@ -1,8 +1,8 @@
 // 루트 빌드 — 본 repo 는 Kotlin 만 사용하며 Java 파일은 추가하지 않는다.
 // Java toolchain 은 JVM 21 (Kotlin 컴파일 결과물의 target).
 plugins {
-    kotlin("jvm") version "2.0.21" apply false
-    kotlin("plugin.spring") version "2.0.21" apply false
+    kotlin("jvm") version "2.4.0" apply false
+    kotlin("plugin.spring") version "2.4.0" apply false
     id("org.springframework.boot") version "3.4.13" apply false
     id("io.spring.dependency-management") version "1.1.7" apply false
     // OpenAPI spec build-time export — 실제 적용은 feed-bootstrap 모듈.
@@ -42,7 +42,7 @@ subprojects {
         }
         dependencies {
             // Reactor Kafka 는 Spring Boot BOM 에 포함되지 않아 명시 관리.
-            dependency("io.projectreactor.kafka:reactor-kafka:1.3.23")
+            dependency("io.projectreactor.kafka:reactor-kafka:1.3.25")
         }
     }
 

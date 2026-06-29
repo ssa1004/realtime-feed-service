@@ -20,7 +20,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.11.0")
     // main 함수의 Hooks.enableAutomaticContextPropagation() (ADR-0005) — 명시적 의존.
     implementation("io.projectreactor:reactor-core")
 
@@ -29,7 +29,7 @@ dependencies {
     }
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
 }
 
 // OpenAPI spec export 설정 — ./gradlew :feed-bootstrap:generateOpenApiDocs.
